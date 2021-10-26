@@ -6,6 +6,7 @@ const {readJSON, writeJSON, writeFile} = fs //readJSON and writeJSON are not par
 
 
 // ****************** declare all file paths ******************
+export const publicDirectory = join(process.cwd(), "./public") // getting the folder path - process.cwd() gives the root folder
 
 const dataFolder = join(process.cwd(), "/src/data") // process.cwd() gives the root folder
 

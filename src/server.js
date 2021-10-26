@@ -43,7 +43,7 @@ server.use(genericErrorHandler)
 
 console.table(listEndpoints(server)) // usage of express-list-endpoints
 
-const PORT = 3001; // Port declaration
+const PORT = process.env.PORT // Port declaration out of .env
 
 server.listen(PORT, () => console.log("Server listening on port :", PORT, "✅")); // Main thread initialization
 
