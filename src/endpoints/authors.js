@@ -1,11 +1,24 @@
 import express from 'express';
 import uniqid from 'uniqid'; // random_id generator
 import createHttpError from "http-errors" // easier error creation
-import {getAuthors, writeAuthors} from '../lib/fs-tools.js'; // fs helper functions 
+import {getAuthors, writeAuthors} from '../lib/fs-tools.js'; // fs helper functions
+import multer from "multer"; // image upload handler
+import { v2 as cloudinary } from "cloudinary" // CND
+import { CloudinaryStorage } from "multer-storage-cloudinary" // multer + CND
 
 
 const authorRouter = express.Router() // declare Router
 // a Router is a set of endpoints that share something like a prefix (authorsRouter is going to share /authors as a prefix)
+
+
+// defining CND properties
+const cloudinaryStorage = new CloudinaryStorage({
+    cloudinary, // CREDENTIALS, this line of code is going to search in process.env for CLOUDINARY_URL
+    params: {
+      folder: "strive-books",
+    },
+  })
+
 
 // ******************** routes for API requests ****************
 
@@ -104,6 +117,30 @@ authorRouter.delete("/:id", async(req, res,next) => {
         next (error)
     }
 })
+
+
+// upload profile avatar
+
+authorRouter.patch("/:id/avatar", multer({ storage: cloudinaryStorage }).single("profilePic"), async (req, res, next) => {
+    try {
+       
+        console.log(req.file)
+        const authors = await getAuthors()
+        const index = authors.findIndex((author) => author.id === req.params.id) 
+       
+        if (index) {
+
+            authors[index].avatar = req.file.path 
+            await writeAuthors(authors)
+            res.send("Image uploaded on Cloudinary:", req.file.path )
+
+        } else {
+            send(createHttpError(404, `Author with ID ${req.params.id} not found`))
+        }
+    } catch (error) {
+      next(error)
+    }
+  })
 
 
 // export the router 
