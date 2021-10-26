@@ -132,10 +132,10 @@ authorRouter.patch("/:id/avatar", multer({ storage: cloudinaryStorage }).single(
 
             authors[index].avatar = req.file.path 
             await writeAuthors(authors)
-            res.send("Image uploaded on Cloudinary:", req.file.path )
+            res.status(201).send(`Image uploaded on Cloudinary: ${req.file.path}` )
 
         } else {
-            send(createHttpError(404, `Author with ID ${req.params.id} not found`))
+            res.send(createHttpError(404, `Author with ID ${req.params.id} not found`))
         }
     } catch (error) {
       next(error)
