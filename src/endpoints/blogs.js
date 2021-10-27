@@ -1,9 +1,11 @@
 import express from "express"
-import uniqid from 'uniqid'; // random_id generator
+import uniqid from 'uniqid'; // randomid generator
 import createHttpError from "http-errors"
 import { validationResult } from "express-validator"
 import { postsValidationMiddlewares } from '../lib/validations.js'; // declared validations
 import {getPosts, writePosts} from "../lib/fs-tools.js"
+import { pipeline } from "stream" //for the PDF
+import { getPDFReadableStream } from "../lib/pdf-tools.js"
 
 const postsRouter = express.Router()
 
@@ -32,7 +34,7 @@ postsRouter.get("/:id", async (req, res, next) => {
   try {
     const posts = await getPosts()
     
-    const post = posts.find(b => b._id == req.params.id)
+    const post = posts.find(b => b.id == req.params.id)
     if (post) {
 
       res.send(post) // send if found
@@ -58,7 +60,7 @@ postsRouter.post("/", postsValidationMiddlewares, async (req, res, next) => {   
       // If we had validation errors --> we need to trigger Bad Request Error Handler
       next(createHttpError(400, { errorsList }))
     } else {
-      const newPost = { _id: uniqid(), ...req.body, createdAt: new Date() }
+      const newPost = { id: uniqid(), ...req.body, createdAt: new Date() }
       const posts = await getPosts()
 
       posts.push(newPost)
@@ -79,7 +81,7 @@ postsRouter.put("/:id", async (req, res, next) => {
   try {
     const posts = await getPosts()
 
-    const index = posts.findIndex(post => post._id === req.params.id)
+    const index = posts.findIndex(post => post.id === req.params.id)
 
     const postToModify = posts[index]
     const updatedFields = req.body
@@ -104,7 +106,7 @@ postsRouter.delete("/:id", async (req, res, next) => {
   try {
     const posts = await getPosts()
 
-    const remainingPosts = posts.filter(post => post._id !== req.params.id)
+    const remainingPosts = posts.filter(post => post.id !== req.params.id)
 
     await writePosts(remainingPosts)
 
@@ -123,7 +125,7 @@ postsRouter.get("/:id/comments", async (req, res, next) => {
   try {
     const posts = await getPosts()
   
-    const post = posts.find(b => b._id == req.params.id)
+    const post = posts.find(b => b.id == req.params.id)
     
     if (post) {
      
@@ -147,7 +149,7 @@ postsRouter.post("/:id/comments", async (req, res, next) => {
   try {
     const posts = await getPosts()
 
-    const index = posts.findIndex(post => post._id === req.params.id)
+    const index = posts.findIndex(post => post.id === req.params.id)
 if(index !== -1) {
 
   posts[index].comments.push({
@@ -178,9 +180,27 @@ if(index !== -1) {
 // PUT 
 // DELETE
 
+//PDF
 
+postsRouter.get("/:id/downloadPDF", async (req, res, next) => {
+  try {
+    const posts = await getPosts()
+    const post = posts.find(p => p.id == req.params.id)
+    if(post) {
+    res.setHeader("Content-Disposition", `attachment; filename=${post.title}.pdf`) // This header tells the browser to do not open the file, but to download it
+    const source = getPDFReadableStream( post ) // PDF READABLE STREAM
+    const destination = res
 
-
+    pipeline(source, destination, err => {
+      if (err) next(err)
+   
+    })}else{
+      res.send((`Blog post with ID ${req.params.id} not found`))
+    } 
+  } catch (error) {
+    next(error)
+  }
+})
 
 
 
