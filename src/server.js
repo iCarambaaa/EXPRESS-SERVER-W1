@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import listEndpoints from "express-list-endpoints"; // table of endpoints
 import authorRouter  from "./endpoints/authors.js"; // import author router
+import postsRouter  from "./endpoints/blogs.js"; // import posts router
 import { genericErrorHandler, badRequestHandler, unauthorizedHandler, notFoundHandler } from "./lib/errorHandlers.js";
 import {publicDirectory} from "./lib/fs-tools.js";
 
@@ -43,6 +44,7 @@ server.use(express.static(publicDirectory)); // declaring as public folder (serv
 // ************************ ENDPOINTS **********************
 
 server.use("/authors", authorRouter)
+server.use("/posts", postsRouter)
 
 
 // *********************** ERROR MIDDLEWARES ***************************
