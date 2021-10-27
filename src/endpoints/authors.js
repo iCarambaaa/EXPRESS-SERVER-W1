@@ -2,10 +2,11 @@ import express from 'express';
 import uniqid from 'uniqid'; // random_id generator
 import createHttpError from "http-errors" // easier error creation
 import {getAuthors, writeAuthors} from '../lib/fs-tools.js'; // fs helper functions
+import { authorsValidationMiddlewares } from '../lib/validations.js'; // declared validations
+import { validationResult } from "express-validator" // validation helper need inside post/put to work with validation middleware
 import multer from "multer"; // image upload handler
 import { v2 as cloudinary } from "cloudinary" // CND
 import { CloudinaryStorage } from "multer-storage-cloudinary" // multer + CND
-
 
 const authorRouter = express.Router() // declare Router
 // a Router is a set of endpoints that share something like a prefix (authorsRouter is going to share /authors as a prefix)
@@ -69,14 +70,21 @@ authorRouter.get("/:id", async(req, res, next) => {
 
 // POST author
 
-authorRouter.post("/", async(req, res, next) => {
+authorRouter.post("/", authorsValidationMiddlewares, async(req, res, next) => {
     try {
-        const authors = await getAuthors()              // get array of authors
-        const newAuthor = {...req.body, id: uniqid()}   // create new author
-        authors.push(newAuthor)                         // add author
-        await writeAuthors(authors)                           // update JSON
-        res.status(201).send(newAuthor)                 // send back updated author
-        
+        const errorList = validationResult(req)
+         if (errorList.isEmpty()) {
+             
+             const authors = await getAuthors()              // get array of authors
+             const newAuthor = {...req.body, id: uniqid()}   // create new author
+             authors.push(newAuthor)                         // add author
+             await writeAuthors(authors)                           // update JSON
+             res.status(201).send(newAuthor)                 // send back updated author
+             
+         }else{
+             
+            next(createError(400, { errorList }));
+         }
     } catch (error) {
         next (error)
     }

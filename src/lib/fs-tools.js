@@ -17,8 +17,8 @@ const blogsJSONPath = join(dataFolder, "blogs.json")
 // ****************** USE HELPERFUNCTIONS TO GET AND WRITE THE JSON *******************
 
 export const getAuthors = () => readJSON(authorsJSONPath) //don`t forget to export
-export const getBlogs = () => readJSON(blogsJSONPath)
+export const getPosts = () => readJSON(blogsJSONPath)
 
 export const writeAuthors = (content) => writeJSON(authorsJSONPath, content) // don't forget the content
-export const writeBlogs = (content) => writeJSON(blogsJSONPath, content)
+export const writePosts = (content) => writeJSON(blogsJSONPath, content)
 
