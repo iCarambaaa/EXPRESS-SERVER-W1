@@ -1,6 +1,6 @@
 import PdfPrinter from "pdfmake"
 import striptags from "striptags"
-import { getBlogsReadableStream, getPosts } from "../lib/fs-tools.js"
+
 
 export const getPDFReadableStream = post => {
   const fonts = {

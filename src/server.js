@@ -3,7 +3,7 @@ import cors from "cors";
 import listEndpoints from "express-list-endpoints"; // table of endpoints
 import authorRouter  from "./endpoints/authors.js"; // import author router
 import postsRouter  from "./endpoints/blogs.js"; // import posts router
-import filesRouter from "./endpoints/files.js"; // import files router
+//import filesRouter from "./endpoints/files.js"; // import files router
 import { genericErrorHandler, badRequestHandler, unauthorizedHandler, notFoundHandler } from "./lib/errorHandlers.js";
 import {publicDirectory} from "./lib/fs-tools.js";
 
