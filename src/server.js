@@ -46,7 +46,7 @@ server.use(express.static(publicDirectory)); // declaring as public folder (serv
 
 server.use("/authors", authorRouter)
 server.use("/posts", postsRouter)
-// server.use("/files", filesRouter)
+server.use("/files", filesRouter)
 
 // *********************** ERROR MIDDLEWARES ***************************
 

@@ -23,6 +23,8 @@ export const writeAuthors = (content) => writeJSON(authorsJSONPath, content) // 
 export const writePosts = (content) => writeJSON(blogsJSONPath, content)
 
 
-// ****************** HELPERFUNCTION TO CREATE READBLE STREAM FOR PDF *******************
+// ****************** HELPERFUNCTION TO CREATE READBLE STREAM *******************
 
-export const getBlogsReadableStream = () => createReadStream(blogsJSONPath)
+export const getAuthorsReadableStream = () => createReadStream(authorsJSONPath)
+
+export const getBlogsReadableStream = () => createReadStream(blogsJSONPath) //not used so far
